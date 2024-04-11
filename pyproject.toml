@@ -10,6 +10,11 @@ python = "^3.11"
 pandas = "^2.2.1"
 transformers = "^4.38.2"
 rank-bm25 = "^0.2.2"
+faiss-cpu = "^1.8.0"
+langchain = "^0.1.15"
+sentence-transformers = "^2.6.1"
+ipykernel = "^6.29.4"
+jupyter = "^1.0.0"
 
 
 [build-system]
