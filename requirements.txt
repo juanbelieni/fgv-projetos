@@ -1,3 +1,5 @@
 faiss-cpu
 langchain
 sentence-transformers
+fastapi
+uvicorn
