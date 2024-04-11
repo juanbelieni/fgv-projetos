@@ -1,7 +1,10 @@
+import pathlib as pl
+import argparse as ap
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders.csv_loader import CSVLoader
-import argparse as ap
+
+DATA_PATH = pl.Path(__file__).parent.parent / "data"
 
 if __name__ == "__main__":
     #
@@ -11,7 +14,8 @@ if __name__ == "__main__":
     parser = ap.ArgumentParser()
 
     parser.add_argument(
-        "-m", "--model",
+        "-m",
+        "--model",
         choices=["all-MiniLM-L6-v2", "all-MiniLM-L12-v2"],
         default="all-MiniLM-L6-v2",
     )
@@ -39,7 +43,7 @@ if __name__ == "__main__":
     print("[Loading data]")
 
     loader = CSVLoader(
-        file_path="./data/spotify-songs.csv",
+        file_path=DATA_PATH / "spotify-songs.csv",
         metadata_columns=[
             "track_id",
             "track_popularity",
@@ -59,7 +63,8 @@ if __name__ == "__main__":
             "tempo",
             "duration_ms",
             "language",
-    ])
+        ],
+    )
 
     documents = loader.load()
 
@@ -73,4 +78,4 @@ if __name__ == "__main__":
 
     print("[Saving vector store index]")
 
-    db.save_local(f"data/{model}-index")
+    db.save_local(DATA_PATH / f"{model}-index")
