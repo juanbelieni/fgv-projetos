@@ -7,8 +7,9 @@ from langchain_community.document_loaders.csv_loader import CSVLoader
 DATA_PATH = pl.Path(__file__).parent.parent / "data"
 
 if __name__ == "__main__":
+
     #
-    # Instantiate parser
+    # Get arguments
     #
 
     parser = ap.ArgumentParser()

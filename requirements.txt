@@ -3,3 +3,4 @@ langchain
 sentence-transformers
 fastapi
 uvicorn
+prompt_toolkit
