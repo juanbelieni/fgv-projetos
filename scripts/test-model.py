@@ -68,7 +68,8 @@ if __name__ == "__main__":
 
     sample = df.sample(frac=f)
     results = pd.DataFrame(
-        columns=["track_id", "track_artist", "track_name", "result"])
+        columns=["track_id", "track_artist", "track_name", "result"]
+        )
 
     for _, row in tqdm(sample.iterrows(), total=len(sample)):
         track_id = row["track_id"]
@@ -78,16 +79,23 @@ if __name__ == "__main__":
         query = f"{track_artist} - {track_name}"
         query_docs = db.similarity_search(query, k=k)
 
-        if row["track_id"] in [doc.metadata["track_id"] for doc in query_docs]:
-            result = "success"
-        else:
-            result = "failure"
+        result = "failure"
+        reciprocal_rank = 0
+
+        for i, doc in enumerate(query_docs):
+            if row["track_id"] == doc.metadata["track_id"]:
+                result = "success"
+                reciprocal_rank = 1/(i+1)
+                break
 
         results = pd.concat([results, pd.DataFrame([{
             "track_id": track_id,
             "track_artist": track_artist,
             "track_name": track_name,
             "result": result,
+            "reciprocal_rank": reciprocal_rank,
         }])], axis=0, ignore_index=True)
 
-    print(results["result"].value_counts(normalize=True))
+    print(f"---\nRESULTS ({f*100}% of data, k = {k}):\n")
+    print(">> Precision:", results['result'].value_counts(normalize=True)['success'])
+    print(">> MRR:", results["reciprocal_rank"].mean())
