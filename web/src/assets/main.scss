@@ -1,0 +1,7 @@
+@use "@picocss/pico/scss/pico" with (
+  $theme-color: "purple"
+);
+
+:root {
+  font-size: 16px;
+}
