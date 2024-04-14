@@ -29,12 +29,12 @@ def read_query(model: str, query: str, k: int):
 
     results = db.similarity_search_with_score(query)[:k]
     
-    return_dict = {}
+    return_list = []
     for i, result in enumerate(results):
-        return_dict[i] = {
+        return_list.append({
             "score": float(result[1]),
             "metadata": result[0].metadata,
             "content": result[0].page_content
-        }
+        })
     
-    return return_dict
+    return return_list
