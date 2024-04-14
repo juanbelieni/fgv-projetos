@@ -1,7 +1,7 @@
 import argparse as ap
 from langchain_community.vectorstores import FAISS
 from utils.data import data_path, load_data_as_documents
-from utils.embeddings import load_model_embeddings
+from utils.embeddings import load_model_embeddings, model_list
 
 if __name__ == "__main__":
     parser = ap.ArgumentParser()
@@ -9,15 +9,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "-m",
         "--model",
-        choices=["all-MiniLM-L6-v2", "all-MiniLM-L12-v2"],
+        choices=model_list,
         default="all-MiniLM-L6-v2",
     )
 
     args = parser.parse_args()
+    model = args.model
 
     print("[Loading embeddings]")
 
-    embeddings = load_model_embeddings(args.model)
+    embeddings = load_model_embeddings(model)
 
     print("[Loading data]")
 

@@ -1,10 +1,9 @@
 import argparse as ap
 import pandas as pd
-import torch
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from utils.data import data_path, load_data_as_df
 from tqdm import tqdm
+from utils.embeddings import load_model_embeddings, model_list
 
 
 def get_arguments():
@@ -12,49 +11,32 @@ def get_arguments():
 
     parser.add_argument(
         "-m", "--model",
-        choices=["all-MiniLM-L6-v2", "all-MiniLM-L12-v2"],
+        choices=model_list,
         default="all-MiniLM-L6-v2",
     )
 
-    parser.add_argument(
-        "-f", "--frac", type=float, default=1,
-    )
+    parser.add_argument("-f", "--frac", type=float, default=1)
 
-    parser.add_argument(
-        "-k", type=int, default=5,
-    )
+    parser.add_argument("-k", type=int, default=5)
 
     args = parser.parse_args()
-
-    model_name = args.model
+    model = args.model
     frac = args.frac
     k = args.k
 
-    return model_name, frac, k
-
-
-def get_model_embeddings(model_name):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    embeddings = HuggingFaceEmbeddings(
-        model_name=f"sentence-transformers/{model_name}",
-        model_kwargs={"device": device},
-        encode_kwargs={"normalize_embeddings": False},
-    )
-
-    return embeddings
+    return model, frac, k
 
 
 if __name__ == "__main__":
-    model_name, frac, k = get_arguments()
+    model, frac, k = get_arguments()
 
     print("[Loading embeddings]")
 
-    embeddings = get_model_embeddings(model_name)
+    embeddings = load_model_embeddings(model)
 
     print("[Loading vector store index]")
 
-    index_path = data_path / f"{model_name}-index"
+    index_path = data_path / f"{model}-index"
     db = FAISS.load_local(
         index_path,
         embeddings,
@@ -94,6 +76,6 @@ if __name__ == "__main__":
     precision = results['result'].value_counts(normalize=True)['success']
     mrr = results["reciprocal_rank"].mean()
 
-    print(f"---\nRESULTS (model = {model_name}, frac={frac*100}%, k = {k}):\n")
+    print(f"---\nRESULTS (model = {model}, frac={frac*100}%, k = {k}):\n")
     print(">> Precision:", precision)
     print(">> MRR:", mrr)
