@@ -46,7 +46,7 @@ def get_model_embeddings(model_name):
 
 
 if __name__ == "__main__":
-    model_name, f, k = get_arguments()
+    model_name, frac, k = get_arguments()
 
     print("[Loading embeddings]")
 
@@ -66,10 +66,8 @@ if __name__ == "__main__":
 
     print("[Testing model]")
 
-    sample = df.sample(frac=f)
-    results = pd.DataFrame(
-        columns=["track_id", "track_artist", "track_name", "result"]
-        )
+    sample = df.sample(frac=frac)
+    results = pd.DataFrame(columns=["result", "reciprocal_rank"])
 
     for _, row in tqdm(sample.iterrows(), total=len(sample)):
         track_id = row["track_id"]
@@ -89,13 +87,13 @@ if __name__ == "__main__":
                 break
 
         results = pd.concat([results, pd.DataFrame([{
-            "track_id": track_id,
-            "track_artist": track_artist,
-            "track_name": track_name,
             "result": result,
             "reciprocal_rank": reciprocal_rank,
         }])], axis=0, ignore_index=True)
 
-    print(f"---\nRESULTS ({f*100}% of data, k = {k}):\n")
-    print(">> Precision:", results['result'].value_counts(normalize=True)['success'])
-    print(">> MRR:", results["reciprocal_rank"].mean())
+    precision = results['result'].value_counts(normalize=True)['success']
+    mrr = results["reciprocal_rank"].mean()
+
+    print(f"---\nRESULTS (model = {model_name}, frac={frac*100}%, k = {k}):\n")
+    print(">> Precision:", precision)
+    print(">> MRR:", mrr)
