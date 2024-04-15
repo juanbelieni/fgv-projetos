@@ -40,7 +40,7 @@ watchDebounced(
 
 <template>
   <main class="container">
-    <h1>CrazzyFrogger</h1>
+    <h1>CrazyFrogger</h1>
 
     <fieldset role="group">
       <input type="search" placeholder="Procure algo..." v-model="query" />
