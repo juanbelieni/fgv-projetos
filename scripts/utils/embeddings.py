@@ -16,7 +16,7 @@ def load_model_embeddings(model: str):
     embeddings = HuggingFaceEmbeddings(
         model_name=f"sentence-transformers/{model}",
         model_kwargs={"device": device},
-        encode_kwargs={"normalize_embeddings": False},
+        encode_kwargs={"normalize_embeddings": True},
     )
 
     return embeddings
