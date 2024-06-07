@@ -1,10 +1,8 @@
 import argparse as ap
-import pandas as pd
 
 from utils.embeddings import load_model_embeddings, model_list
 from utils.data import load_data_as_df
-from utils.vespa import vespa_app_package
-from vespa.application import Vespa
+from utils.vespa import vespa_app
 from vespa.io import VespaResponse
 
 if __name__ == "__main__":
@@ -16,23 +14,18 @@ if __name__ == "__main__":
         default="all-MiniLM-L6-v2")
     args = parser.parse_args()
 
-    print("[Loading data from CSV]")
-
-    df = load_data_as_df()
-    df.head()
-
     print("[Loading embeddings]")
 
     embeddings = load_model_embeddings(args.model)
 
-    print("[Creating Vespa app]")
+    print("[Loading data from CSV]")
 
-    vespa_app = Vespa(
-        url="http://localhost",
-        port="8080",
-        application_package=vespa_app_package)
+    df = load_data_as_df()[:1000]
 
     print("[Generating embeddings]")
+
+    df["track_name_embedding"] = embeddings.embed_documents(df["track_name"].tolist())
+    df["lyrics_embedding"] = embeddings.embed_documents(df["lyrics"].tolist())
 
     iter_data = [
         dict(
@@ -41,9 +34,9 @@ if __name__ == "__main__":
                 track_id=row["track_id"],
                 track_name=row["track_name"],
                 lyrics=row["lyrics"],
-                track_name_embedding=embeddings.embed_query(row["track_name"]),
-                lyrics_embedding=embeddings.embed_query(row["lyrics"])))
-        for row in df.to_dict("records")[:50]]
+                track_name_embedding=row["track_name_embedding"],
+                lyrics_embedding=row["lyrics_embedding"]))
+        for row in df.to_dict("records")]
 
     print("[Feeding data to Vespa]")
 

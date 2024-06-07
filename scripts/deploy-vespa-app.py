@@ -33,7 +33,7 @@ if __name__ == "__main__":
     print("[Deploying Vespa Docker container with the config]")
 
     vespa_docker = VespaDocker()
-    vespa_app = vespa_docker.deploy_from_disk(
+    vespa_docker.deploy_from_disk(
         application_name="crazyfrogger",
         application_root=temp_dir
     )
