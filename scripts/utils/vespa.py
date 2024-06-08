@@ -6,7 +6,7 @@ from vespa.package import (
     ApplicationPackage,
     Field,
     RankProfile,
-    Function
+    FieldSet
 )
 from vespa.application import Vespa
 
@@ -44,6 +44,10 @@ vespa_app_package.schema.add_fields(
     ),
 )
 
+vespa_app_package.schema.add_field_set(
+    FieldSet(name="default", fields=["track_name", "lyrics"])
+)
+
 vespa_app_package.schema.add_rank_profile(
     RankProfile(
         name="track_name_semantic",
@@ -56,7 +60,7 @@ vespa_app_package.schema.add_rank_profile(
     RankProfile(
         name="lyrics_semantic",
         inputs=[("query(query_embedding)", "tensor<float>(x[384])")],
-        first_phase="closeness(field, track_name_embedding)",
+        first_phase="closeness(field, lyrics_embedding)",
     )
 )
 
@@ -92,15 +96,13 @@ def get_relevant_songs(
     if "bm25" in rank_profile:
         response = vespa_app.query(
             yql="select * from sources * where userQuery()",
-            hits=1,
+            hits=hits,
             query=query,
             ranking=rank_profile,
         )
 
-        print(response.get_json())
-        print(response.is_successful())
+        return response.hits
 
-        print(response.hits)
     else:
         assert embeddings is not None
 
@@ -114,6 +116,5 @@ def get_relevant_songs(
             },
         )
 
-        print(response.get_json())
+        return response.hits
 
-        print(response.hits)

@@ -31,7 +31,10 @@ if __name__ == "__main__":
         if query == "q":
             break
 
-        get_relevant_songs(query, args.rank_profile, hits=5, embeddings=embeddings)
+        songs = get_relevant_songs(query, args.rank_profile, hits=5, embeddings=embeddings)
+
+        for song in songs:
+            print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
 
         if not args.loop:
             break
