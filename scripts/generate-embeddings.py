@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     print("[Loading data from CSV]")
 
-    df = load_data_as_df()[:1000]
+    df = load_data_as_df()[:500]
 
     print("[Generating embeddings]")
 

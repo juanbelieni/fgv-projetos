@@ -18,6 +18,8 @@ if __name__ == "__main__":
         choices=model_list,
         default="all-MiniLM-L6-v2",
     )
+    parser.add_argument("-q", "--query", default="none")
+    
     args = parser.parse_args()
 
     if "semantic" in args.rank_profile:
@@ -26,15 +28,28 @@ if __name__ == "__main__":
         embeddings = None
 
     while True:
-        query = prompt("Enter a query (q to quit): ")
+        if args.query != "none":
+            test_mode = True
+            print("[Using test mode...]")
+            query = args.query
+        else: 
+            test_mode = False
+            query  = prompt("Enter a query (q to quit): ")
 
         if query == "q":
             break
 
         songs = get_relevant_songs(query, args.rank_profile, hits=5, embeddings=embeddings)
 
+        if test_mode:
+            f = open("./scripts/results.txt", "a")
+            
         for song in songs:
             print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
+            if test_mode:
+                f.write(f'{song["fields"]["track_id"]};{song["fields"]["track_name"]};{song["relevance"]}\n')
+
+        f.close()
 
         if not args.loop:
             break
