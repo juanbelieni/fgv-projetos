@@ -89,10 +89,7 @@ if not CLOUD:
         port="8080",
         application_package=vespa_app_package)
 else:
-    endpoint = os.getenv("ENDPOINT")
-    if endpoint is None:
-        endpoint = "https://localhost:8080"
-        print(f"ENDPOINT environment variable not set. Defaulting to {endpoint}")
+    endpoint = "https://afa26c4b.c65fc8bc.z.vespa-app.cloud/"
     
     os.environ["TENANT_NAME"] = "crazyfrogger"  # Replace with your tenant name
     application = "crazyfrogger"
