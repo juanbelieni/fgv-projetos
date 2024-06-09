@@ -45,9 +45,10 @@ if __name__ == "__main__":
             f = open("./scripts/results.txt", "a")
             
         for song in songs:
-            print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
             if test_mode:
                 f.write(f'{song["fields"]["track_id"]};{song["fields"]["track_name"]};{song["relevance"]}\n')
+            else: 
+                print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
 
         f.close()
 
