@@ -1,4 +1,6 @@
+import os
 import pandas as pd
+from pathlib import Path
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from typing import Literal
 
@@ -9,6 +11,8 @@ from vespa.package import (
     FieldSet
 )
 from vespa.application import Vespa
+
+CLOUD = True
 
 vespa_app_package = ApplicationPackage(name="crazyfrogger")
 
@@ -79,10 +83,33 @@ vespa_app_package.schema.add_rank_profile(
     ),
 )
 
-vespa_app = Vespa(
-    url="http://localhost",
-    port="8080",
-    application_package=vespa_app_package)
+if not CLOUD:
+    vespa_app = Vespa(
+        url="http://localhost",
+        port="8080",
+        application_package=vespa_app_package)
+else:
+    endpoint = "https://afa26c4b.c65fc8bc.z.vespa-app.cloud/"
+    
+    os.environ["TENANT_NAME"] = "crazyfrogger"  # Replace with your tenant name
+    application = "crazyfrogger"
+    
+    cert_path = (
+        Path.home()
+        / ".vespa"
+        / f"{os.environ['TENANT_NAME']}.{application}.default/data-plane-public-cert.pem"
+    )
+    key_path = (
+        Path.home()
+        / ".vespa"
+        / f"{os.environ['TENANT_NAME']}.{application}.default/data-plane-private-key.pem"
+    )
+    
+    print(f"Connecting to Vespa Cloud at {endpoint}")
+    vespa_app = Vespa(url=endpoint,
+                      application_package=vespa_app_package,
+                      cert=cert_path,
+                      key=key_path)
 
 
 def get_relevant_songs(

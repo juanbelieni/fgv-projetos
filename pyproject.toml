@@ -7,16 +7,20 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pandas = "^2.2.1"
-transformers = "^4.38.2"
-rank-bm25 = "^0.2.2"
 faiss-cpu = "^1.8.0"
-langchain = "^0.1.15"
-sentence-transformers = "^2.6.1"
+langchain = "0.1.15"
+langchain-community = "0.0.32"
+langchain-core = "0.1.41"
+langchain-text-splitters = "0.0.1"
+sentence-transformers = "2.6.1"
+fastapi = "^0.111.0"
+uvicorn = "^0.29.0"
+prompt-toolkit = "^3.0.43"
+pyvespa = "0.38.0"
 ipykernel = "^6.29.4"
 jupyter = "^1.0.0"
-fastapi = "^0.110.1"
-uvicorn = "^0.29.0"
+vespacli = "^8.350.38"
+datasets = "^2.19.2"
 
 
 [build-system]

@@ -2,16 +2,15 @@
 import { ref, watchEffect } from "vue";
 import { watchDebounced } from "@vueuse/core";
 
-const models = [
-  "all-mpnet-base-v2",
-  "all-MiniLM-L12-v2",
-  "all-MiniLM-L6-v2",
-  "paraphrase-multilingual-MiniLM-L12-v2",
-  "paraphrase-MiniLM-L3-v2",
+const rankProfiles = [
+  "track_name_semantic",
+  "lyrics_semantic",
+  "track_name_bm25",
+  "lyrics_bm25",
 ];
 
 const query = ref("");
-const selectedModel = ref("all-MiniLM-L12-v2");
+const selectedRankProfile = ref("lyrics_semantic");
 
 const songs = ref({
   list: [],
@@ -19,19 +18,19 @@ const songs = ref({
 });
 
 watchDebounced(
-  [query, selectedModel],
+  [query, selectedRankProfile],
   async () => {
     if (query.value === "") {
       songs.value = { list: [], loading: false };
     } else {
       songs.value = { list: [], loading: true };
 
-      const model = selectedModel.value;
+      const rankProfile = selectedRankProfile.value;
       const query_ = encodeURIComponent(query.value);
 
-      const response = await fetch(`http://localhost:8000/query/${model}/5?query=${query_}`);
+      const response = await fetch(`http://localhost:8000/query/${rankProfile}/5?query=${query_}`);
       const body = await response.json();
-      songs.value = { list: body.map((item) => item.metadata.track_id), loading: false };
+      songs.value = { list: body.map((item) => item.track_id), loading: false };
     }
   },
   { debounce: 500 }
@@ -44,8 +43,8 @@ watchDebounced(
 
     <fieldset role="group">
       <input type="search" placeholder="Procure algo..." v-model="query" />
-      <select aria-label="Modelo" v-model="selectedModel">
-        <option v-for="model of models" :key="model">{{ model }}</option>
+      <select aria-label="Modelo" v-model="selectedRankProfile">
+        <option v-for="rankProfile of rankProfiles" :key="rankProfile">{{ rankProfile }}</option>
       </select>
     </fieldset>
 
