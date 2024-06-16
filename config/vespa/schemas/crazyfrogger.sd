@@ -1,0 +1,31 @@
+schema crazyfrogger {
+    document crazyfrogger {
+        field track_id type string {
+            indexing: summary
+        }
+        field track_name type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field lyrics type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field embedding type tensor<float>(x[384]) {
+            indexing: attribute | summary
+            attribute {
+                distance-metric: angular
+            }
+        }
+    }
+    rank-profile default {
+        inputs {
+            query(query_embedding) tensor<float>(x[384])         
+        }
+        first-phase {
+            expression {
+                closeness(field, embedding)
+            }
+        }
+    }
+}

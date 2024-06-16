@@ -12,7 +12,7 @@ def get_arguments():
     parser.add_argument(
         "-m", "--model",
         choices=model_list,
-        default="all-MiniLM-L6-v2",
+        default="all-MiniLM-12-v2",
     )
 
     parser.add_argument("-f", "--frac", type=float, default=1)

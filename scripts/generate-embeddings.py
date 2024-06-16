@@ -11,7 +11,7 @@ if __name__ == "__main__":
         "-m",
         "--model",
         choices=model_list,
-        default="all-MiniLM-L6-v2")
+        default="all-MiniLM-L12-v2")
     args = parser.parse_args()
 
     print("[Loading embeddings]")
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     print("[Loading data from CSV]")
 
-    df = load_data_as_df()[:500]
+    df = load_data_as_df()#[:500]
 
     print("[Generating embeddings]")
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     print("[Feeding data to Vespa]")
 
     def callback(response: VespaResponse, id: str):
-        if not response.is_successful():
+        if not response.is_successfull():
             print(f"Error when feeding document {id}: {response.get_json()}")
 
     vespa_app.feed_iterable(

@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = 'all-MiniLM-L6-v2'
+model = 'all-MiniLM-L12-v2'
 rank_profiles = ["track_name_semantic",
                  "lyrics_semantic",
                  "track_name_bm25",

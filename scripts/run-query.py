@@ -16,7 +16,7 @@ if __name__ == "__main__":
         "-m",
         "--model",
         choices=model_list,
-        default="all-MiniLM-L6-v2",
+        default="all-MiniLM-L12-v2",
     )
     parser.add_argument("-q", "--query", default="none")
     
@@ -40,17 +40,9 @@ if __name__ == "__main__":
             break
 
         songs = get_relevant_songs(query, args.rank_profile, hits=5, embeddings=embeddings)
-
-        if test_mode:
-            f = open("./scripts/results.txt", "a")
             
-        for song in songs:
-            if test_mode:
-                f.write(f'{song["fields"]["track_id"]};{song["fields"]["track_name"]};{song["relevance"]}\n')
-            else: 
-                print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
-
-        f.close()
+        for song in songs: 
+            print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
 
         if not args.loop:
             break

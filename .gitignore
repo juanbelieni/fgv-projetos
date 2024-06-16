@@ -13,12 +13,15 @@ __pycache__/
 # C extensions
 *.so
 
+vespa_integration.py
+
 # Distribution / packaging
 .Python
 build/
 develop-eggs/
 dist/
 downloads/
+notebooks/
 eggs/
 .eggs/
 lib/

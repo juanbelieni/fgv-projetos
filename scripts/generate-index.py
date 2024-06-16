@@ -10,7 +10,7 @@ if __name__ == "__main__":
         "-m",
         "--model",
         choices=model_list,
-        default="all-MiniLM-L6-v2",
+        default="all-MiniLM-L12-v2",
     )
 
     args = parser.parse_args()
