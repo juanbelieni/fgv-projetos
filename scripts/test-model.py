@@ -3,24 +3,18 @@ import pandas as pd
 from langchain_community.vectorstores import FAISS
 from utils.data import data_path, load_data_as_df
 from tqdm import tqdm
-from utils.embeddings import load_model_embeddings, model_list
-
+from utils.embeddings import load_model_embeddings
 
 def get_arguments():
     parser = ap.ArgumentParser()
-
-    parser.add_argument(
-        "-m", "--model",
-        choices=model_list,
-        default="all-MiniLM-12-v2",
-    )
 
     parser.add_argument("-f", "--frac", type=float, default=1)
 
     parser.add_argument("-k", type=int, default=5)
 
     args = parser.parse_args()
-    model = args.model
+    # Define standard model
+    model = "all-MiniLM-L12-v2"
     frac = args.frac
     k = args.k
 

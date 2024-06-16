@@ -1,18 +1,17 @@
 import argparse as ap
 
-from utils.embeddings import load_model_embeddings, model_list
+from utils.embeddings import load_model_embeddings
 from utils.data import load_data_as_df
 from utils.vespa import vespa_app
 from vespa.io import VespaResponse
 
 if __name__ == "__main__":
     parser = ap.ArgumentParser()
-    parser.add_argument(
-        "-m",
-        "--model",
-        choices=model_list,
-        default="all-MiniLM-L12-v2")
+
     args = parser.parse_args()
+
+    # Define args.model directly
+    args.model = "all-MiniLM-L12-v2"
 
     print("[Loading embeddings]")
 

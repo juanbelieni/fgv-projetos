@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_community.vectorstores import FAISS
 from utils.data import data_path
-from utils.embeddings import load_model_embeddings#, model_list
+from utils.embeddings import load_model_embeddings
 from utils.vespa import get_relevant_songs
 
 app = FastAPI()

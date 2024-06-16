@@ -1,7 +1,7 @@
 import pathlib as pl
 import argparse as ap
 from prompt_toolkit import prompt
-from utils.embeddings import load_model_embeddings, model_list
+from utils.embeddings import load_model_embeddings
 from utils.vespa import get_relevant_songs
 
 DATA_PATH = pl.Path(__file__).parent.parent / "data"
@@ -12,15 +12,12 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--rank-profile", required=True, choices=[
         "track_name_semantic", "lyrics_semantic",
         "track_name_bm25", "lyrics_bm25"])
-    parser.add_argument(
-        "-m",
-        "--model",
-        choices=model_list,
-        default="all-MiniLM-L12-v2",
-    )
     parser.add_argument("-q", "--query", default="none")
     
     args = parser.parse_args()
+
+    # Define args.model directly
+    args.model = "all-MiniLM-L12-v2"
 
     if "semantic" in args.rank_profile:
         embeddings = load_model_embeddings(args.model)
