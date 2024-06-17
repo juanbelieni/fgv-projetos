@@ -35,7 +35,15 @@ def load_data_as_documents():
 
 
 def load_data_as_df() -> pd.DataFrame:
+    print("Loading data as an DataFrame...")
+
     df = pd.read_csv(data_path / "spotify-songs.csv")
     df = df[df["lyrics"].notnull()]
     return df
 
+
+def load_queries_as_df() -> pd.DataFrame:
+    print("Loading queries as an DataFrame...")
+
+    df = pd.read_csv(data_path / "queries.csv")
+    return df

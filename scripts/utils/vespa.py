@@ -90,10 +90,10 @@ if not CLOUD:
         application_package=vespa_app_package)
 else:
     endpoint = "https://afa26c4b.c65fc8bc.z.vespa-app.cloud/"
-    
+
     os.environ["TENANT_NAME"] = "crazyfrogger"  # Replace with your tenant name
     application = "crazyfrogger"
-    
+
     cert_path = (
         Path.home()
         / ".vespa"
@@ -104,8 +104,8 @@ else:
         / ".vespa"
         / f"{os.environ['TENANT_NAME']}.{application}.default/data-plane-private-key.pem"
     )
-    
-    print(f"Connecting to Vespa Cloud at {endpoint}")
+
+    print(f"Connecting to Vespa Cloud at {endpoint}...")
     vespa_app = Vespa(url=endpoint,
                       application_package=vespa_app_package,
                       cert=cert_path,
@@ -144,4 +144,3 @@ def get_relevant_songs(
         )
 
         return response.hits
-
