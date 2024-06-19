@@ -5,7 +5,7 @@ from utils.embeddings import load_model_embeddings
 import pandas as pd
 from itertools import product
 
-num_songs = 5
+num_songs = 250
 model = "all-MiniLM-L12-v2"
 
 rank_profiles = [
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     results = []
 
     for rank_profile, query_type in product(rank_profiles, query_types):
-        print(f"Running experiment {rank_profile=}, {query_type=}")
+        print(f"\nRunning experiment {rank_profile=}, {query_type=}")
 
         experiment_results = {
             k: dict(precision=0, mrr=0)
@@ -77,5 +77,8 @@ if __name__ == "__main__":
                 f"precision={experiment_results[k]['precision']:.4f} "
                 f"mrr={experiment_results[k]['mrr']:.4f}")
 
+    results_path = data_path / "experiment-results.csv"
     results_df = pd.DataFrame(results)
-    print(results_df.to_csv(index=False))
+    results_df.to_csv(results_path, index=False)
+
+    print(f"Results saved at {results_path}.")
