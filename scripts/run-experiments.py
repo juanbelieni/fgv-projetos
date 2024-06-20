@@ -4,9 +4,11 @@ from utils.vespa import get_relevant_songs
 from utils.embeddings import load_model_embeddings
 import pandas as pd
 from itertools import product
+import os
 
-num_songs = 250
+num_songs = 500
 model = "all-MiniLM-L12-v2"
+results_path = data_path / "experiment-results.csv"
 
 rank_profiles = [
     "track_name_semantic", "lyrics_semantic",
@@ -14,11 +16,28 @@ rank_profiles = [
 ]
 
 query_types = [
-    "title",
+    "track_name",
     "llm"
 ]
 
 ks = [2, 5, 10]
+
+
+def save_results(results):
+    print(f"Saving results to {results_path}...")
+
+    results_df = pd.DataFrame(results)
+    results_df.to_csv(results_path, index=False)
+
+
+def check_experiment_results(rank_profile, query_type) -> bool:
+    print(f"Checking experiment at {results_path}...")
+
+    with open(results_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            if f"{rank_profile},{query_type}" in line:
+                return True
+    return False
 
 
 if __name__ == "__main__":
@@ -28,11 +47,22 @@ if __name__ == "__main__":
     df = pd.merge(data_df, queries_df, on="track_id")
     df = df.sample(n=num_songs)
 
+    df = df[df["lyrics"].notnull()]
+    df = df[df["query"].notnull()]
+
     embeddings = load_model_embeddings(model)
-    results = []
+    results = (
+        pd.read_csv(results_path).to_dict('records')
+        if os.path.exists(results_path)
+        else []
+    )
 
     for rank_profile, query_type in product(rank_profiles, query_types):
-        print(f"\nRunning experiment {rank_profile=}, {query_type=}")
+        print(f"\nRunning experiment {rank_profile=}, {query_type=}...")
+
+        if check_experiment_results(rank_profile, query_type):
+            print("Experiment already done. Skipping...")
+            continue
 
         experiment_results = {
             k: dict(precision=0, mrr=0)
@@ -43,8 +73,8 @@ if __name__ == "__main__":
             track_id = row["track_id"]
 
             match query_type:
-                case "title": query = row["track_name"]
-                case "llm":   query = row["query"]
+                case "track_name": query = row["track_name"]
+                case "llm": query = row["query"]
 
             songs = get_relevant_songs(
                 query=query,
@@ -77,8 +107,4 @@ if __name__ == "__main__":
                 f"precision={experiment_results[k]['precision']:.4f} "
                 f"mrr={experiment_results[k]['mrr']:.4f}")
 
-    results_path = data_path / "experiment-results.csv"
-    results_df = pd.DataFrame(results)
-    results_df.to_csv(results_path, index=False)
-
-    print(f"Results saved at {results_path}.")
+        save_results(results)
