@@ -12,7 +12,6 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--rank-profile", required=True, choices=[
         "track_name_semantic", "lyrics_semantic",
         "track_name_bm25", "lyrics_bm25", "hybrid"])
-    # parser.add_argument("-q", "--query", default="none")
     
     args = parser.parse_args()
 

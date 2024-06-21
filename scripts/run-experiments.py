@@ -12,7 +12,7 @@ results_path = data_path / "experiment-results.csv"
 
 rank_profiles = [
     "track_name_semantic", "lyrics_semantic",
-    "track_name_bm25", "lyrics_bm25"
+    "track_name_bm25", "lyrics_bm25", "hybrid"
 ]
 
 query_types = [
@@ -82,7 +82,7 @@ if __name__ == "__main__":
                 hits=10,
                 embeddings=embeddings)
 
-            track_ids = [s["fields"]["track_id"] for s in songs]
+            track_ids = [s["track_id"] for s in songs]
 
             for k in ks:
                 if track_id in track_ids[:k]:

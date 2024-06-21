@@ -116,8 +116,9 @@ def normalize_scores(results):
     scores = [hit['relevance'] for hit in results['root']['children']]
     min_score = min(scores)
     max_score = max(scores)
-    for hit in results['root']['children']:
-        hit['relevance'] = (hit['relevance'] - min_score) / (max_score - min_score)
+    if min_score != max_score:
+        for hit in results['root']['children']:
+            hit['relevance'] = (hit['relevance'] - min_score) / (max_score - min_score)
     return results
 
 
