@@ -120,33 +120,6 @@ def normalize_scores(results):
         hit['relevance'] = (hit['relevance'] - min_score) / (max_score - min_score)
     return results
 
-# def combine_scores(bm25_results, semantic_results):
-#     bm25_results = normalize_scores(bm25_results)
-#     semantic_results = normalize_scores(semantic_results)
-
-#     hybrid_results = []
-#     for semantic_hit in semantic_results['root']['children']:
-#         if semantic_hit[]
-#         for bm25_hit in bm25_results['root']['children']:
-#             # print("bm25",bm25_hit['fields']['track_name'])
-#             if bm25_hit['fields']['track_id'] == semantic_hit['fields']['track_id']:
-#                 hybrid_score = (bm25_hit['relevance'] + semantic_hit['relevance']) / 2
-#                 hybrid_results.append({
-#                     'id': bm25_hit['fields']['track_id'],
-#                     'relevance': hybrid_score,
-#                     'fields': bm25_hit['fields']
-#                 })
-#                 break
-
-#     # if len(bm25_results['root']['children']) < 10:
-#     #     for semantic_hit in semantic_results['root']['children']:
-
-#             # else:
-#             #     # if no result in bm25
-#             #     hybrid_score = semantic_hit['relevance'] / 2
-    
-#     hybrid_results.sort(key=lambda x: x['relevance'], reverse=True)
-#     return hybrid_results
 
 def combine_scores(bm25_results, semantic_results):
     bm25_results = normalize_scores(bm25_results)
