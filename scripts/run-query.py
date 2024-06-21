@@ -11,35 +11,34 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--loop", action=ap.BooleanOptionalAction)
     parser.add_argument("-r", "--rank-profile", required=True, choices=[
         "track_name_semantic", "lyrics_semantic",
-        "track_name_bm25", "lyrics_bm25"])
-    parser.add_argument("-q", "--query", default="none")
+        "track_name_bm25", "lyrics_bm25", "hybrid"])
+    # parser.add_argument("-q", "--query", default="none")
     
     args = parser.parse_args()
 
     # Define args.model directly
     args.model = "all-MiniLM-L12-v2"
 
-    if "semantic" in args.rank_profile:
+    if "semantic" or "hybrid" in args.rank_profile:
         embeddings = load_model_embeddings(args.model)
     else:
         embeddings = None
 
     while True:
-        if args.query != "none":
-            test_mode = True
-            print("[Using test mode...]")
-            query = args.query
-        else: 
-            test_mode = False
-            query  = prompt("Enter a query (q to quit): ")
+        query  = prompt("Enter a query (q to quit): ")
 
         if query == "q":
             break
 
         songs = get_relevant_songs(query, args.rank_profile, hits=5, embeddings=embeddings)
             
-        for song in songs: 
-            print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
+        if args.rank_profile == "hybrid":
+            for song in songs:
+                print(song['track_id'], song['track_name'], "\n   BM25 score:",song['bm25_score'])
+                print("   Semantic score:", song['semantic_score'],"\n   Combined score:",song['combined_score'],"\n\n")
+        else:
+            for song in songs: 
+                print(song["fields"]["track_id"], song["fields"]["track_name"], song["relevance"])
 
         if not args.loop:
             break

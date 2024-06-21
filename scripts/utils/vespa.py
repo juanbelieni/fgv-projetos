@@ -112,11 +112,80 @@ else:
                       key=key_path)
 
 
+def normalize_scores(results):
+    scores = [hit['relevance'] for hit in results['root']['children']]
+    min_score = min(scores)
+    max_score = max(scores)
+    for hit in results['root']['children']:
+        hit['relevance'] = (hit['relevance'] - min_score) / (max_score - min_score)
+    return results
+
+# def combine_scores(bm25_results, semantic_results):
+#     bm25_results = normalize_scores(bm25_results)
+#     semantic_results = normalize_scores(semantic_results)
+
+#     hybrid_results = []
+#     for semantic_hit in semantic_results['root']['children']:
+#         if semantic_hit[]
+#         for bm25_hit in bm25_results['root']['children']:
+#             # print("bm25",bm25_hit['fields']['track_name'])
+#             if bm25_hit['fields']['track_id'] == semantic_hit['fields']['track_id']:
+#                 hybrid_score = (bm25_hit['relevance'] + semantic_hit['relevance']) / 2
+#                 hybrid_results.append({
+#                     'id': bm25_hit['fields']['track_id'],
+#                     'relevance': hybrid_score,
+#                     'fields': bm25_hit['fields']
+#                 })
+#                 break
+
+#     # if len(bm25_results['root']['children']) < 10:
+#     #     for semantic_hit in semantic_results['root']['children']:
+
+#             # else:
+#             #     # if no result in bm25
+#             #     hybrid_score = semantic_hit['relevance'] / 2
+    
+#     hybrid_results.sort(key=lambda x: x['relevance'], reverse=True)
+#     return hybrid_results
+
+def combine_scores(bm25_results, semantic_results):
+    bm25_results = normalize_scores(bm25_results)
+    semantic_results = normalize_scores(semantic_results)
+
+    combined_results = {}
+    for bm25_hit in bm25_results['root']['children']:
+        doc_id = bm25_hit['fields']['track_id']
+        doc_name = bm25_hit['fields']['track_name']
+        bm25_score = bm25_hit['relevance']
+        if doc_id not in combined_results:
+            combined_results[doc_id] = {'track_id': doc_id, 'track_name': doc_name, 'bm25_score': bm25_score, 'semantic_score': 0}
+        else:
+            combined_results[doc_id]['bm25_score'] = bm25_score
+
+    for semantic_hit in semantic_results['root']['children']:
+        doc_id = semantic_hit['fields']['track_id']
+        doc_name = semantic_hit['fields']['track_name']
+        semantic_score = semantic_hit['relevance']
+        if doc_id not in combined_results:
+            combined_results[doc_id] = {'track_id': doc_id, 'track_name': doc_name, 'bm25_score': 0, 'semantic_score': semantic_score}
+        else:
+            combined_results[doc_id]['semantic_score'] = semantic_score
+
+    for doc_id in combined_results:
+        combined_results[doc_id]['combined_score'] = (combined_results[doc_id]['bm25_score'] + combined_results[doc_id]['semantic_score']) / 2
+
+    combined_results_list = list(combined_results.values())
+    combined_results_list.sort(key=lambda x: x['combined_score'], reverse=True)
+
+    return combined_results_list
+
+
+
 def get_relevant_songs(
         query: str,
         rank_profile: Literal[
             "track_name_semantic", "lyrics_semantic",
-            "track_name_bm25", "lyrics_bm25"],
+            "track_name_bm25", "lyrics_bm25", "hybrid"],
         hits: int,
         embeddings: HuggingFaceEmbeddings = None) -> pd.DataFrame:
 
@@ -130,7 +199,7 @@ def get_relevant_songs(
 
         return response.hits
 
-    else:
+    elif "semantic" in rank_profile:
         assert embeddings is not None
 
         query_embedding = embeddings.embed_query(query)
@@ -144,3 +213,32 @@ def get_relevant_songs(
         )
 
         return response.hits
+    
+    else:  # Hybrid
+        assert embeddings is not None
+
+        # Track name semantic
+        query_embedding = embeddings.embed_query(query)
+
+        response_semantic = vespa_app.query(
+            body={
+                "yql": f"select * from sources * where ({{targetHits:{hits}}}nearestNeighbor(track_name_embedding, query_embedding))",
+                "ranking.profile": "track_name_semantic",
+                "input.query(query_embedding)": query_embedding,
+            },
+        )
+
+        # Lyrics BM25
+        response_bm25 = vespa_app.query(
+            yql="select * from sources * where userQuery()",
+            query=query,
+            hits=hits,
+            ranking="lyrics_bm25",
+        )
+
+        bm25_results = response_bm25.json
+        semantic_results = response_semantic.json
+        hybrid_results = combine_scores(bm25_results, semantic_results)
+
+        return hybrid_results[:hits]
+
